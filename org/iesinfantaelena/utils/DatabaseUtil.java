@@ -1,13 +1,14 @@
 package org.iesinfantaelena.utils;
 
+import java.sql.Connection;
 import java.sql.DriverManager;
 
-public class Connection {
-	public static final String DB_URL = "jdbc:mysql://localhost:3306/mercado";
+public class DatabaseUtil {
+	public static final String DB_URL = "jdbc:h2:mem:mercado"; //"jdbc:mysql://localhost:3306/mercado";
 	public static final String DB_USERNAME = "root";
 	public static final String DB_PASSWORD = "";
 	
-	public static Connection getConnection() {
+	public static Connection getH2Connection() {
 		try {
 			Class.forName("org.h2.Driver");
 			

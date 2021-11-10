@@ -18,147 +18,57 @@ import org.iesinfantaelena.utils.Utilidades;
  * @license GPLv3
  */
 
-public class Cafes {
-	private List<Cafe> cafes;
+public class Cafes implements CafesDAO {
+	CafesDAO cafesDAO;
 	
-	private Connection connection;
-	private ResultSet resultSet;
-	private PreparedStatement preparedStatement;
-	private Statement statement;
-	
-	public Cafes() {
-		cafes = new ArrayList<>();
-		
-		// SQL
-		connection = null;
-		resultSet = null;
-		preparedStatement = null;
-		statement = null;
-		
-		setCafes();
-	}
-	
-	public List<Cafe> getCafes() {
-		return cafes;
-	}
-	
-	public boolean setCafes() {
-		if (!setConnection() || !createStatement()) {
-			return false;
-		}
-		
+	/**
+	 * Acceso a la base de datos movido a DAO
+	 */
+	public Cafes(CafeDAOType type) throws AccesoDatosException {
 		try {
-			resultSet = statement.executeQuery("SELECT CAF_NOMBRE, PROV_ID, PRECIO, VENTAS, TOTAL FROM cafes;");
-			
-			if (!setCafesFromResult()) {
-				return false;
+			if (type == CafeDAOType.H2) {
+				cafesDAO = new CafesDAOImpH2();
+			} else {
+				cafesDAO = new CafesDAOImpSql();
 			}
-		} catch (Exception ex) {
-			ex.printStackTrace();
-			
-			return false;
+		} catch (AccesoDatosException ex) {
+			throw ex;
 		}
-		
-		liberar();
-		cerrar();
-		
-		return true;
-	}
-	
-	private boolean setCafesFromResult() {
-		boolean result = false;
-		List<Cafe> cafes = new ArrayList<>();
-		
-		try {
-			while (resultSet.next()) {
-				Cafe cafe = new Cafe();
-				cafe.setNombre(resultSet.getString(1));
-				cafe.setProvid(resultSet.getInt(2));
-				cafe.setPrecio(resultSet.getFloat(3));
-				cafe.setVentas(resultSet.getInt(4));
-				cafe.setTotal(resultSet.getInt(5));
-				
-				cafes.add(cafe);
-			}
-			
-			result = true;
-		} catch (SQLException ex) {
-			ex.printStackTrace();
-		}
-		
-		this.cafes = cafes;
-		
-		return result;
-	}
-	
-	private boolean setConnection() {
-		connection = DatabaseUtil.getH2Connection();
-		
-		return connection != null;
-	}
-	
-	private boolean createStatement() {
-		try {
-			statement = connection.createStatement();
-			
-			return true;
-		} catch (SQLException ex) {
-			ex.printStackTrace();
-			
-			return false;
-		}
-	}
-	
-	private boolean prepareStatement(String statement) {
-		try {
-			preparedStatement = connection.prepareStatement(statement);
-			
-			return true;
-		} catch (SQLException ex) {
-			ex.printStackTrace();
-			
-			return false;
-		}
-	}
-	
-	public boolean add(Cafe cafe) {
-		if (!setConnection()) {
-			return false;
-		}
-		
-		if (prepareStatement("INSERT INTO cafes (CAF_NOMBRE, PROV_ID, PRECIO, VENTAS, TOTAL) VALUES (?, ?, ?, ?, ?)")) {
-			try {
-				preparedStatement.setString(1, cafe.getNombre());
-				preparedStatement.setInt(2, cafe.getProvid());
-				preparedStatement.setFloat(3, cafe.getPrecio());
-				preparedStatement.setInt(4, cafe.getVentas());
-				preparedStatement.setInt(5, cafe.getTotal());
-				
-				preparedStatement.execute();
-				
-				liberar();
-				cerrar();
-				
-				return true;
-			} catch (SQLException ex) {
-				ex.printStackTrace();
-			}
-		}
-		
-		return false;
 	}
 	
 	@Override
-	public String toString() {
-		String cafesString = "";
-		
-		for (Cafe cafe : cafes) {
-			cafesString += cafe;
-		}
-		
-		return cafesString;
+	public void verTabla() throws AccesoDatosException {
+		cafesDAO.verTabla();
 	}
 	
+	@Override
+	public Cafe buscar(String nombre) throws AccesoDatosException {
+		return cafesDAO.buscar(nombre);
+	}
+	
+	@Override
+	public Cafe insertar(String nombre, int provid, float precio, int ventas, int total) throws AccesoDatosException {
+		return cafesDAO.insertar(nombre, provid, precio, ventas, total);
+	}
+	
+	@Override
+	public void borrar(String nombre) throws AccesoDatosException {
+		cafesDAO.borrar(nombre);
+	}
+	
+	@Override
+	public List<Cafe> cafesPorProveedor(int provid) throws AccesoDatosException {
+		return cafesDAO.cafesPorProveedor(provid);
+	}
+	
+	@Override
+	public void cerrar() throws AccesoDatosException {
+		cafesDAO.cerrar();
+	}
+	
+	/*
+	 * Código por defecto de la clase
+	 */
 //	public boolean executeStatement() {
 //		boolean returnValue;
 //		
@@ -178,42 +88,6 @@ public class Cafes {
 //		
 //		return returnValue;
 //	}
-	
-	public boolean cerrar() {
-		try {
-			if (connection != null) {
-				connection.close();
-			}
-			
-			return true;
-		} catch (Exception ex) {
-			ex.printStackTrace();
-			
-			return false;
-		}
-	}
-	
-	public boolean liberar() {
-		try {
-			if (resultSet != null) {
-				resultSet.close();
-			}
-			
-			if (preparedStatement != null) {
-				preparedStatement.close();
-			}
-			
-			if (statement != null) {
-				statement.close();
-			}
-			
-			return true;
-		} catch (Exception ex) {
-			ex.printStackTrace();
-			
-			return false;
-		}
-	}
 	
 //	private static Connection con;
 	

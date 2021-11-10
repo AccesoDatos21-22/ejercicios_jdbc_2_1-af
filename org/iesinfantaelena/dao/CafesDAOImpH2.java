@@ -8,12 +8,11 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Nota: Entiendo que el objetivo del DAO es separar la funcionalidad de la DB,
- * pero ya que el ejercicio pide hacerlo en Cafes.java, lo hago allí
+ * Funcionalidad de base de datos en SQL
  */
-public class CafesDAOImpSql implements CafesDAO {
-	public static final String DB_URL = "jdbc:mysql://localhost:3306/mercado"; // "jdbc:h2:mem:mercado";
-	public static final String DB_USERNAME = "root";
+public class CafesDAOImpH2 implements CafesDAO {
+	public static final String DB_URL = "jdbc:h2:~/mercado";
+	public static final String DB_USERNAME = "";
 	public static final String DB_PASSWORD = "";
 	
 	private Connection connection = null;
@@ -21,21 +20,42 @@ public class CafesDAOImpSql implements CafesDAO {
 	private PreparedStatement preparedStatement = null;
 	private Statement statement = null;
 	
-	public CafesDAOImpSql() {
+	public CafesDAOImpH2() throws AccesoDatosException {
 		try {
 			Class.forName("org.h2.Driver");
 			
 			connection =  DriverManager.getConnection(DB_URL, DB_USERNAME, DB_PASSWORD);
+			
+			createStatement();
+			
+			statement.execute("CREATE TABLE cafes ("
+					+ "CAF_NOMBRE varchar(32) NOT NULL, "
+					+ "PROV_ID int(11) NOT NULL, "
+					+ "PRECIO decimal(10,2) NOT NULL, "
+					+ "VENTAS int(11) NOT NULL, "
+					+ "TOTAL int(11) NOT NULL");
 		} catch (Exception ex) {
-			ex.printStackTrace();
+			throw new AccesoDatosException("No se pudo inicializar la conexión a la base de datos SQL", ex);
 		}
 	}
 	
 	@Override
 	public void verTabla() throws AccesoDatosException {
-		for (Cafe cafe : cafes) {
-			cafe.toString();
+		if (createStatement()) {
+			try {
+				resultSet = statement.executeQuery("SELECT CAF_NOMBRE, PROV_ID, PRECIO, VENTAS, TOTAL FROM cafes");
+				
+				for (Cafe cafe : getCafesFromResult()) {
+					System.out.println(cafe);
+				}
+			} catch (SQLException ex) {
+				throw new AccesoDatosException("No se pudieron recuperar los cafés", ex);
+			} finally {
+				liberar();
+			}
 		}
+		
+		throw new AccesoDatosException("No se pudieron recuperar los cafés");
 	}
 	
 	@Override
@@ -54,7 +74,7 @@ public class CafesDAOImpSql implements CafesDAO {
 					return null;
 				}
 			} catch (SQLException ex) {
-				ex.printStackTrace();
+				throw new AccesoDatosException("No se pudo buscar el café", ex);
 			} finally {
 				liberar();
 			}
@@ -84,7 +104,7 @@ public class CafesDAOImpSql implements CafesDAO {
 				
 				return cafe;
 			} catch (SQLException ex) {
-				ex.printStackTrace();
+				throw new AccesoDatosException("No se pudo insertar el café", ex);
 			} finally {
 				liberar();
 			}
@@ -94,20 +114,20 @@ public class CafesDAOImpSql implements CafesDAO {
 	}
 	
 	@Override
-	public boolean borrar(String nombre) throws AccesoDatosException {
+	public void borrar(String nombre) throws AccesoDatosException {
 		if (prepareStatement("DELETE FROM cafes WHERE CAF_NOMBRE = ?")) {
 			try {
 				preparedStatement.execute();
-			} catch (SQLException ex) {
-				ex.printStackTrace();
 				
-				throw new AccesoDatosException("No se pudo borrar el café");
+				return;
+			} catch (SQLException ex) {
+				throw new AccesoDatosException("No se pudo borrar el café", ex);
 			} finally {
 				liberar();
 			}
 		}
 		
-		
+		throw new AccesoDatosException("No se pudo borrar el café");
 	}
 	
 	@Override
@@ -116,13 +136,13 @@ public class CafesDAOImpSql implements CafesDAO {
 		
 		if (prepareStatement("SELECT CAF_NOMBRE, PROV_ID, PRECIO, VENTAS, TOTAL FROM cafes WHERE CAF_NOMBRE = ?")) {
 			try {
-				preparedStatement.setString(1, nombre);
+				preparedStatement.setInt(1, provid);
 				
 				resultSet = preparedStatement.executeQuery();
 				
 				return getCafesFromResult();
 			} catch (SQLException ex) {
-				ex.printStackTrace();
+				throw new AccesoDatosException("No se pudieron buscar los cafés por proveedor", ex);
 			} finally {
 				liberar();
 			}
@@ -176,21 +196,18 @@ public class CafesDAOImpSql implements CafesDAO {
 		}
 	}
 	
-	public boolean cerrar() {
+	@Override
+	public void cerrar() throws AccesoDatosException {
 		try {
 			if (connection != null) {
 				connection.close();
 			}
-			
-			return true;
 		} catch (Exception ex) {
-			ex.printStackTrace();
-			
-			return false;
+			throw new AccesoDatosException("No se pudieron buscar los cafés por proveedor");
 		}
 	}
 	
-	public boolean liberar() {
+	public void liberar() throws AccesoDatosException {
 		try {
 			if (resultSet != null) {
 				resultSet.close();
@@ -203,12 +220,8 @@ public class CafesDAOImpSql implements CafesDAO {
 			if (statement != null) {
 				statement.close();
 			}
-			
-			return true;
 		} catch (Exception ex) {
-			ex.printStackTrace();
-			
-			return false;
+			throw new AccesoDatosException("No se pudo liberar la conexión", ex);
 		}
 	}
 }

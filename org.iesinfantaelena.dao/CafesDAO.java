@@ -10,10 +10,11 @@ public interface CafesDAO {
 	
 	public Cafe buscar(String nombre) throws AccesoDatosException;
 	
-	public boolean insertar(String nombre, int provid, float precio, int ventas, int total)
-			throws AccesoDatosException;
+	public Cafe insertar(String nombre, int provid, float precio, int ventas, int total) throws AccesoDatosException;
 	
-	public boolean borrar(String nombre) throws AccesoDatosException;
+	public void borrar(String nombre) throws AccesoDatosException;
 
 	public List<Cafe> cafesPorProveedor(int provid) throws AccesoDatosException;
+	
+	public void cerrar() throws AccesoDatosException;
 }

@@ -16,5 +16,8 @@ public class AccesoDatosException extends MercadoException{
 	public AccesoDatosException(String message) {
         super(message);
     }
+	public AccesoDatosException(String message, Throwable ex) {
+		super(message, ex);
+	}
 
 }

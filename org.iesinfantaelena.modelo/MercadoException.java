@@ -19,5 +19,8 @@ public class MercadoException extends Exception{
 	public MercadoException(String message) {
         super(message);
     }
-
+	
+	public MercadoException(String message, Throwable ex) {
+		super(message, ex);
+	}
 }

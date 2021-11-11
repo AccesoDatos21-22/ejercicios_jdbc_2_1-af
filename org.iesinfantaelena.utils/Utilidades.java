@@ -34,7 +34,7 @@ public class Utilidades {
 	private int portNumber;
 	private Properties prop;
 
-	private static final String PROPERTIES_FILE = System.getProperty("user.dir") + "/mariadb-properties.xml";
+	private static final String PROPERTIES_FILE = System.getProperty("user.dir") + "/sqlite-properties.xml";
 
 	public Utilidades() throws FileNotFoundException, IOException, InvalidPropertiesFormatException {
 		super();
@@ -63,9 +63,9 @@ public class Utilidades {
 		this.driver = this.prop.getProperty("driver");
 		this.dbName = this.prop.getProperty("database_name");
 		this.userName = this.prop.getProperty("user_name");
-		this.password = this.prop.getProperty("password");
-		this.serverName = this.prop.getProperty("server_name");
-		this.portNumber = Integer.parseInt(this.prop.getProperty("port_number"));
+	//	this.password = this.prop.getProperty("password");
+	//	this.serverName = this.prop.getProperty("server_name");
+	//	this.portNumber = Integer.parseInt(this.prop.getProperty("port_number"));
     /*
 		System.out.println("Set the following properties:");
 		System.out.println("dbms: " + dbms);
@@ -88,7 +88,7 @@ public class Utilidades {
 		Connection conn = null;
 		Properties connectionProps = new Properties();
 		connectionProps.put("user", this.userName);
-		connectionProps.put("password", this.password);
+	//	connectionProps.put("password", this.password);
 
 		if (this.dbms.equals("mariadb")) {
 			/* Solicito a DriverManager una conexión con la base de datos */
@@ -112,8 +112,11 @@ public class Utilidades {
 			conn = DriverManager
 					.getConnection("jdbc:" + this.dbms + ":" + System.getProperty("user.dir") + this.dbName);
 		} else if (this.dbms.equals("h2")) {
+			System.out.println( this.dbms );
+			System.out.println(this.dbName  );
+			System.out.println( this.userName);
 			conn = DriverManager
-					.getConnection("jdbc:" + this.dbms + ":" + this.dbName + "," +this.userName+"," );
+					.getConnection("jdbc:" + this.dbms + ":"+ this.dbName + "," +this.userName+"," );
 		}
 		System.out.println("Connectado a BD");
 		return conn;

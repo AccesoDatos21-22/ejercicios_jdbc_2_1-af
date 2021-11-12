@@ -40,13 +40,13 @@ public class CafesDAOImpSql implements CafesDAO {
 					System.out.println(cafe);
 				}
 			} catch (SQLException ex) {
+				ex.printStackTrace();
+				
 				throw new AccesoDatosException("No se pudieron recuperar los cafés", ex);
 			} finally {
 				liberar();
 			}
 		}
-		
-		throw new AccesoDatosException("No se pudieron recuperar los cafés");
 	}
 	
 	@Override
@@ -108,6 +108,7 @@ public class CafesDAOImpSql implements CafesDAO {
 	public void borrar(String nombre) throws AccesoDatosException {
 		if (prepareStatement("DELETE FROM cafes WHERE CAF_NOMBRE = ?")) {
 			try {
+				preparedStatement.setString(1, nombre);
 				preparedStatement.execute();
 				
 				return;
@@ -123,7 +124,7 @@ public class CafesDAOImpSql implements CafesDAO {
 	
 	@Override
 	public List<Cafe> cafesPorProveedor(int provid) throws AccesoDatosException {
-		List<Cafe> cafes = new ArrayList<>();
+		printProveedor(provid);
 		
 		if (prepareStatement("SELECT CAF_NOMBRE, PROV_ID, PRECIO, VENTAS, TOTAL FROM cafes WHERE CAF_NOMBRE = ?")) {
 			try {
@@ -139,7 +140,7 @@ public class CafesDAOImpSql implements CafesDAO {
 			}
 		}
 		
-		throw new AccesoDatosException("No se pudieron buscar los cafés por proveedor");
+		return null;
 	}
 	
 	private List<Cafe> getCafesFromResult() {
@@ -161,6 +162,41 @@ public class CafesDAOImpSql implements CafesDAO {
 		}
 		
 		return cafes;
+	}
+	
+	public List<Cafe> printProveedor(int provid) throws AccesoDatosException {
+		if (prepareStatement("SELECT PROV_ID, PROV_NOMBRE, CALLE, CIUDAD, PAIS, CP " +
+				"FROM proveedores WHERE PROV_ID = ?")) {
+			try {
+				preparedStatement.setInt(1, provid);
+				
+				resultSet = preparedStatement.executeQuery();
+				
+				printProveedorFromResult();
+			} catch (SQLException ex) {
+				throw new AccesoDatosException("No se pudieron buscar los proveedores", ex);
+			} finally {
+				liberar();
+			}
+		}
+		
+		return null;
+	}
+	
+	private void printProveedorFromResult() {
+		try {
+			while (resultSet.next()) {
+				System.out.println("Datos del proveedor");
+				System.out.println("ID: " + resultSet.getInt(1));
+				System.out.println("Nombre: " + resultSet.getString(2));
+				System.out.println("Calle" + resultSet.getString(3));
+				System.out.println("Ciudad: " + resultSet.getString(4));
+				System.out.println("País: " + resultSet.getString(5));
+				System.out.println("CP: " + resultSet.getString(6));
+			}
+		} catch (SQLException ex) {
+			ex.printStackTrace();
+		}
 	}
 	
 	private boolean createStatement() {
@@ -194,7 +230,7 @@ public class CafesDAOImpSql implements CafesDAO {
 				connection.close();
 			}
 		} catch (Exception ex) {
-			throw new AccesoDatosException("No se pudieron buscar los cafés por proveedor");
+			throw new AccesoDatosException("No se pudo cerrar la conexión");
 		}
 	}
 	

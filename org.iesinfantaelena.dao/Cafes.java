@@ -1,14 +1,9 @@
 package org.iesinfantaelena.dao;
 
-import java.io.IOException;
-import java.sql.*;
-import java.util.ArrayList;
 import java.util.List;
 
 import org.iesinfantaelena.modelo.AccesoDatosException;
 import org.iesinfantaelena.modelo.Cafe;
-import org.iesinfantaelena.utils.DatabaseUtil;
-import org.iesinfantaelena.utils.Utilidades;
 
 /**
  * @description
@@ -24,9 +19,9 @@ public class Cafes implements CafesDAO {
 	/**
 	 * Acceso a la base de datos movido a DAO
 	 */
-	public Cafes(CafeDAOType type) throws AccesoDatosException {
+	public Cafes(DAOType type) throws AccesoDatosException {
 		try {
-			if (type == CafeDAOType.H2) {
+			if (type == DAOType.H2) {
 				cafesDAO = new CafesDAOImpH2();
 			} else {
 				cafesDAO = new CafesDAOImpSql();

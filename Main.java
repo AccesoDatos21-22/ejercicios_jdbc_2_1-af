@@ -1,22 +1,45 @@
 import org.iesinfantaelena.dao.DAOType;
 import org.iesinfantaelena.dao.Cafes;
+import org.iesinfantaelena.dao.CafesDAOImpSql;
 import org.iesinfantaelena.dao.Libros;
 import org.iesinfantaelena.modelo.AccesoDatosException;
 import org.iesinfantaelena.modelo.Libro;
+import org.iesinfantaelena.utils.Utilidades;
+
+import java.io.IOException;
+import java.sql.SQLException;
 
 public class Main {
-	public static void main(String[] args) {
-		
-		// Ejercicio 2
+	public static void main(String[] args) throws IOException, SQLException, AccesoDatosException {
+		fernando();
+		alberto();
+	}
+	
+	private static void fernando() {
 		try {
-			//Cafes cafes = new Cafes(CafeDAOType.SQL);
+			// Ejercicio 3
+			Utilidades util = new Utilidades();
+			util.getConnection();
+			
+			// ejercicio 7
+			Libros libros = new Libros();
+			libros.crearTablaLibros();
+			libros.getCamposLibroDefault();
+		} catch (Exception ex) {
+			ex.printStackTrace();
+		}
+	}
+	
+	private static void alberto() {
+		try {
+			//Cafes cafes = new Cafes(DAOType.SQL);
 			Cafes cafes = new Cafes(DAOType.H2);
 			
-			cafes.insertar("Cafetito", 150, 1.0f, 100,1000);
-			cafes.insertar("Cafe tacilla", 150, 2.0f, 100,1000);
+			cafes.insertar("Cafetito", 49, 1.0f, 100,1000);
+			cafes.insertar("Cafe tacilla", 49, 2.0f, 100,1000);
 			cafes.verTabla();
 			cafes.buscar("tacilla");
-			cafes.cafesPorProveedor(150);
+			cafes.cafesPorProveedor(49);
 			cafes.borrar("Cafe tacilla");
 			cafes.verTabla();
 			

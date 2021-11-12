@@ -25,6 +25,7 @@ public class Libros {
 	public static final String DB_URL_SQL = "jdbc:mysql://localhost:3306/libros";
 	public static final String DB_USERNAME = "";
 	public static final String DB_PASSWORD = "";
+	private static final String SELECT_CAMPOS_QUERY = "SELECT * FROM LIBROS LIMIT 1";
 	
 	// Consultas a realizar en BD
 	
@@ -35,7 +36,7 @@ public class Libros {
 	
 	/**
 	 * Constructor: inicializa conexión
-	 * 
+	 *
 	 * @throws AccesoDatosException
 	 */
 	public Libros() throws AccesoDatosException {
@@ -118,7 +119,7 @@ public class Libros {
 	
 	/**
 	 * Método para cerrar la conexión
-	 * 
+	 *
 	 * @throws AccesoDatosException
 	 */
 	public void cerrar() throws AccesoDatosException {
@@ -133,7 +134,7 @@ public class Libros {
 	
 	/**
 	 * Método para liberar recursos
-	 * 
+	 *
 	 * @throws AccesoDatosException
 	 */
 	public void liberar() throws AccesoDatosException {
@@ -153,21 +154,21 @@ public class Libros {
 			throw new AccesoDatosException("No se pudo liberar la conexión", ex);
 		}
 	}
-
+	
 	/**
 	 * Metodo que muestra por pantalla los datos de la tabla libros
-	 * 
+	 *
 	 * @throws SQLException
 	 */
 	public List<Libro> verCatalogo() throws AccesoDatosException {
 		return null;
 	}
 	
-    /**
-     * Actualiza el numero de copias para un libro
-     * @param libro
-     * @throws AccesoDatosException
-     */
+	/**
+	 * Actualiza el numero de copias para un libro
+	 * @param libro
+	 * @throws AccesoDatosException
+	 */
 	
 	public void actualizarCopias(Libro libro) throws AccesoDatosException {
 		if (prepareStatement(
@@ -195,15 +196,15 @@ public class Libros {
 		}
 	}
 	
-    /**
-     * Añade un nuevo libro a la BD
-     * @param libro
-     * @throws AccesoDatosException
-     */
+	/**
+	 * Añade un nuevo libro a la BD
+	 * @param libro
+	 * @throws AccesoDatosException
+	 */
 	public void anadirLibro(Libro libro) throws AccesoDatosException {
 		if (prepareStatement(
 				"INSERT INTO libros (isbn, titulo, autor, editorial, paginas, copias) " +
-				"VALUES (?, ?, ?, ?, ?, ?);")) {
+						"VALUES (?, ?, ?, ?, ?, ?);")) {
 			try {
 				preparedStatement.setInt(1, libro.getISBN());
 				preparedStatement.setString(2, libro.getTitulo());
@@ -274,7 +275,6 @@ public class Libros {
 		return null;
 	}
 	
-	private static final String SELECT_CAMPOS_QUERY = "SELECT * FROM LIBROS LIMIT 1";
 	public String[] getCamposLibroDefault() throws AccesoDatosException {
 		
 		/*Sentencia sql con parámetros de entrada*/

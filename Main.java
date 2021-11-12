@@ -1,6 +1,7 @@
 import org.iesinfantaelena.dao.CafeDAOType;
 import org.iesinfantaelena.dao.Cafes;
 import org.iesinfantaelena.dao.CafesDAOImpSql;
+import org.iesinfantaelena.dao.Libros;
 import org.iesinfantaelena.modelo.AccesoDatosException;
 import org.iesinfantaelena.utils.Utilidades;
 
@@ -8,7 +9,7 @@ import java.io.IOException;
 import java.sql.SQLException;
 
 public class Main {
-	public static void main(String[] args) throws IOException, SQLException {
+	public static void main(String[] args) throws IOException, SQLException, AccesoDatosException {
 	/*	try {
 			Cafes cafes = new Cafes(CafeDAOType.H2);
 			
@@ -25,6 +26,8 @@ public class Main {
 			ex.printStackTrace();
 		}*/
 		Utilidades util = new Utilidades();
-		util.getConnection();
+		//util.getConnection();
+		Libros libro = new Libros();
+		libro.getCamposLibro(util);
 	}
 }

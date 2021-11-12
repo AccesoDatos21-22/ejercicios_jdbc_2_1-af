@@ -88,9 +88,11 @@ public class Utilidades {
 		Connection conn = null;
 		Properties connectionProps = new Properties();
 		connectionProps.put("user", this.userName);
+
 	//	connectionProps.put("password", this.password);
 
 		if (this.dbms.equals("mariadb")) {
+
 			/* Solicito a DriverManager una conexión con la base de datos */
 			/*
 			 * Para identificar el controldador a usar se le proporciona una URL, si no lo
@@ -105,21 +107,23 @@ public class Utilidades {
 					"jdbc:" + this.dbms + "://" + this.serverName + ":" + this.portNumber + "/" + this.dbName,
 					connectionProps);
 		} else if (this.dbms.equals("derby")) {
+
 			conn = DriverManager.getConnection("jdbc:" + this.dbms + ":" + this.dbName + ";create=true",
 					connectionProps);
 
 		} else if (this.dbms.equals("sqlite")) {
+
 			conn = DriverManager
 					.getConnection("jdbc:" + this.dbms + ":" + System.getProperty("user.dir") + this.dbName);
-		} else if (this.dbms.equals("h2")) {
-			System.out.println( this.dbms );
-			System.out.println(this.dbName  );
-			System.out.println( this.userName);
+		} else if (this.dbms.equals("h2:mem")) {
+
 			conn = DriverManager
 					.getConnection("jdbc:" + this.dbms + ":"+ this.dbName + "," +this.userName+"," );
 		}
 		System.out.println("Connectado a BD");
+
 		return conn;
+
 	}
 
 	/**

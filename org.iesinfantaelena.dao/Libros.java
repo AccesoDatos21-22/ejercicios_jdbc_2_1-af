@@ -32,7 +32,7 @@ public class Libros {
 	private Statement stmt;
 	private ResultSet rs;
 	private PreparedStatement pstmt;
-
+	private static final String SELECT_CAMPOS_QUERY = "SELECT * FROM LIBROS LIMIT 1";
 	/**
 	 * Constructor: inicializa conexión
 	 * 
@@ -40,25 +40,10 @@ public class Libros {
 	 */
 	
 	public Libros() throws AccesoDatosException {
-		try {
-			// Obtenemos la conexión
-			this.con = new Utilidades().getConnection();
-			this.stmt = null;
-			this.rs = null;
-			this.pstmt = null;
-		} catch (IOException e) {
-			// Error al leer propiedades
-			// En una aplicación real, escribo en el log y delego
-			System.err.println(e.getMessage());
-			throw new AccesoDatosException(
-					"Ocurrió un error al acceder a los datos");
-		} catch (SQLException sqle) {
-			// En una aplicación real, escribo en el log y delego
-			// System.err.println(sqle.getMessage());
-			Utilidades.printSQLException(sqle);
-			throw new AccesoDatosException(
-					"Ocurrió un error al acceder a los datos");
-		}
+		// Obtenemos la conexión
+		this.stmt = null;
+		this.rs = null;
+		this.pstmt = null;
 	}
 
 	
@@ -158,9 +143,44 @@ public class Libros {
 	 * @throws AccesoDatosException
 	 */
 
-	public String[] getCamposLibro() throws AccesoDatosException {
-       
-    return null;
+	public String[] getCamposLibro(Utilidades util) throws AccesoDatosException {
+
+		pstmt = null;
+		rs= null;
+		ResultSetMetaData rsmd = null;
+		String[] campos = null;
+
+		try {
+			//Solicitamos a la conexion un objeto stmt para nuestra consulta
+			this.con= util.getConnection();
+			System.out.println(util.getConnection());
+			pstmt = this.con.prepareStatement(SELECT_CAMPOS_QUERY);
+
+			//Le solicitamos al objeto stmt que ejecute nuestra consulta
+			//y nos devuelve los resultados en un objeto ResultSet
+			rs = pstmt.executeQuery();
+			rsmd = rs.getMetaData();
+			int columns = rsmd.getColumnCount();
+			campos = new String[columns];
+			for (int i = 0; i < columns; i++) {
+				//Los indices de las columnas comienzan en 1
+				campos[i] = rsmd.getColumnLabel(i + 1);
+			}
+			return campos;
+
+		} catch (SQLException sqle) {
+			// En una aplicación real, escribo en el log y delego
+			Utilidades.printSQLException(sqle);
+			throw new AccesoDatosException(
+					"Ocurrió un error al acceder a los datos");
+
+		} finally{
+			liberar();
+		}
+
+
+
+
 	}
 
 
@@ -171,5 +191,5 @@ public class Libros {
 
 
 
-}
+	}
 

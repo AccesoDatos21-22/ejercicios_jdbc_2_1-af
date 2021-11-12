@@ -40,13 +40,13 @@ public class CafesDAOImpSql implements CafesDAO {
 					System.out.println(cafe);
 				}
 			} catch (SQLException ex) {
+				ex.printStackTrace();
+				
 				throw new AccesoDatosException("No se pudieron recuperar los cafés", ex);
 			} finally {
 				liberar();
 			}
 		}
-		
-		throw new AccesoDatosException("No se pudieron recuperar los cafés");
 	}
 	
 	@Override
@@ -108,6 +108,7 @@ public class CafesDAOImpSql implements CafesDAO {
 	public void borrar(String nombre) throws AccesoDatosException {
 		if (prepareStatement("DELETE FROM cafes WHERE CAF_NOMBRE = ?")) {
 			try {
+				preparedStatement.setString(1, nombre);
 				preparedStatement.execute();
 				
 				return;
@@ -139,7 +140,7 @@ public class CafesDAOImpSql implements CafesDAO {
 			}
 		}
 		
-		throw new AccesoDatosException("No se pudieron buscar los cafés por proveedor");
+		return null;
 	}
 	
 	private List<Cafe> getCafesFromResult() {
@@ -194,7 +195,7 @@ public class CafesDAOImpSql implements CafesDAO {
 				connection.close();
 			}
 		} catch (Exception ex) {
-			throw new AccesoDatosException("No se pudieron buscar los cafés por proveedor");
+			throw new AccesoDatosException("No se pudo cerrar la conexión");
 		}
 	}
 	

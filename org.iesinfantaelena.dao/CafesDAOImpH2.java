@@ -11,11 +11,12 @@ import java.util.List;
  * Funcionalidad de base de datos en SQL
  */
 public class CafesDAOImpH2 implements CafesDAO {
-	public static final String DB_URL = "jdbc:h2:~/mercado";
+	// La base de datos H2 se crea en memoria
+	public static final String DB_URL = "jdbc:h2:mem:~/mercado";
 	public static final String DB_USERNAME = "";
 	public static final String DB_PASSWORD = "";
 	
-	private Connection connection = null;
+	private Connection connection;
 	private ResultSet resultSet = null;
 	private PreparedStatement preparedStatement = null;
 	private Statement statement = null;
@@ -26,6 +27,12 @@ public class CafesDAOImpH2 implements CafesDAO {
 			
 			connection =  DriverManager.getConnection(DB_URL, DB_USERNAME, DB_PASSWORD);
 			
+			
+		} catch (Exception ex) {
+			throw new AccesoDatosException("No se pudo inicializar la conexión a la base de datos SQL", ex);
+		}
+		
+		try {
 			createStatement();
 			
 			statement.execute("CREATE TABLE cafes ("
@@ -33,9 +40,9 @@ public class CafesDAOImpH2 implements CafesDAO {
 					+ "PROV_ID int(11) NOT NULL, "
 					+ "PRECIO decimal(10,2) NOT NULL, "
 					+ "VENTAS int(11) NOT NULL, "
-					+ "TOTAL int(11) NOT NULL");
+					+ "TOTAL int(11) NOT NULL);");
 		} catch (Exception ex) {
-			throw new AccesoDatosException("No se pudo inicializar la conexión a la base de datos SQL", ex);
+			throw new AccesoDatosException("No se pudo crear la tabla 'cafes'", ex);
 		}
 	}
 	
@@ -43,7 +50,7 @@ public class CafesDAOImpH2 implements CafesDAO {
 	public void verTabla() throws AccesoDatosException {
 		if (createStatement()) {
 			try {
-				resultSet = statement.executeQuery("SELECT CAF_NOMBRE, PROV_ID, PRECIO, VENTAS, TOTAL FROM cafes");
+				resultSet = statement.executeQuery("SELECT CAF_NOMBRE, PROV_ID, PRECIO, VENTAS, TOTAL FROM cafes;");
 				
 				for (Cafe cafe : getCafesFromResult()) {
 					System.out.println(cafe);
@@ -54,8 +61,6 @@ public class CafesDAOImpH2 implements CafesDAO {
 				liberar();
 			}
 		}
-		
-		throw new AccesoDatosException("No se pudieron recuperar los cafés");
 	}
 	
 	@Override
@@ -80,7 +85,7 @@ public class CafesDAOImpH2 implements CafesDAO {
 			}
 		}
 		
-		throw new AccesoDatosException("No se pudo buscar el café");
+		return null;
 	}
 	
 	@Override
@@ -117,6 +122,7 @@ public class CafesDAOImpH2 implements CafesDAO {
 	public void borrar(String nombre) throws AccesoDatosException {
 		if (prepareStatement("DELETE FROM cafes WHERE CAF_NOMBRE = ?")) {
 			try {
+				preparedStatement.setString(1, nombre);
 				preparedStatement.execute();
 				
 				return;
@@ -134,7 +140,7 @@ public class CafesDAOImpH2 implements CafesDAO {
 	public List<Cafe> cafesPorProveedor(int provid) throws AccesoDatosException {
 		List<Cafe> cafes = new ArrayList<>();
 		
-		if (prepareStatement("SELECT CAF_NOMBRE, PROV_ID, PRECIO, VENTAS, TOTAL FROM cafes WHERE CAF_NOMBRE = ?")) {
+		if (prepareStatement("SELECT CAF_NOMBRE, PROV_ID, PRECIO, VENTAS, TOTAL FROM cafes WHERE PROV_ID = ?")) {
 			try {
 				preparedStatement.setInt(1, provid);
 				
@@ -148,7 +154,7 @@ public class CafesDAOImpH2 implements CafesDAO {
 			}
 		}
 		
-		throw new AccesoDatosException("No se pudieron buscar los cafés por proveedor");
+		return null;
 	}
 	
 	private List<Cafe> getCafesFromResult() {
@@ -203,7 +209,7 @@ public class CafesDAOImpH2 implements CafesDAO {
 				connection.close();
 			}
 		} catch (Exception ex) {
-			throw new AccesoDatosException("No se pudieron buscar los cafés por proveedor");
+			throw new AccesoDatosException("No se pudo cerrar la conexión");
 		}
 	}
 	

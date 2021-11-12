@@ -1,5 +1,5 @@
 package org.iesinfantaelena.dao;
 
-public enum CafeDAOType {
+public enum DAOType {
 	SQL, H2;
 }

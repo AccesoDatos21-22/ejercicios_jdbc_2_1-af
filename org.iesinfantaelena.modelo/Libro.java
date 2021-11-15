@@ -71,7 +71,6 @@ public class Libro {
 		this.copias = copias;
 	}
 	
-	
 	@Override
 	public String toString() {
 		return "Libro{" +

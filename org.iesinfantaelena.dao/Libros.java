@@ -161,6 +161,26 @@ public class Libros {
 	 * @throws SQLException
 	 */
 	public List<Libro> verCatalogo() throws AccesoDatosException {
+		if (createStatement()) {
+			try {
+				resultSet = statement.executeQuery("SELECT isbn, titulo, autor, editorial, paginas, copias FROM libros");
+				
+				System.out.println(); // Padding
+				
+				System.out.println("Catálogo de libros:");
+				
+				for (Libro libro : getLibrosFromResult()) {
+					System.out.println(libro.toString());
+				}
+				
+				System.out.println(); // Padding
+			} catch (SQLException ex) {
+				throw new AccesoDatosException("No se pudieron cargar los libros", ex);
+			} finally {
+				liberar();
+			}
+		}
+		
 		return null;
 	}
 	

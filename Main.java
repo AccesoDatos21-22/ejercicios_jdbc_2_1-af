@@ -74,6 +74,8 @@ public class Main {
 			
 			libros.anadirLibro(libro);
 			
+			libros.verCatalogo();
+			
 			for (String thisField : libros.getCamposLibro()) {
 				// Todos los campos en la misma línea
 				System.out.print(thisField + " ");
@@ -86,6 +88,7 @@ public class Main {
 			
 			libro.setCopias(4000);
 			libros.actualizarCopias(libro);
+			System.out.println("Copias del libro actualizadas");
 			System.out.println(libros.obtenerLibro(1234).toString());
 			
 			libros.borrar(libro);
